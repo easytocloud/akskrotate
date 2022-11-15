@@ -35,7 +35,6 @@ jobs:
           # Optional - multiline string.
           depends_on: |
             "bash" => :build
-            "gcc"
 
           # Custom install command for your formula.
           # Required - string.
@@ -43,7 +42,7 @@ jobs:
 
           # Custom test command for your formula so you can run `brew test`.
           # Optional - string.
-          test: 'assert_match("123", "123")'
+          test: 'assert_match("Please set AWS_PROFILE before calling akskrotate", shell_output("akskrotate 2>&1", 1))'
 
           # Adds URL and checksum targets for different OS and architecture pairs. Using this option assumes 
           # a tar archive exists on your GitHub repo with the following URL pattern (this cannot be customized):
@@ -72,7 +71,7 @@ jobs:
           #
           # Finally, mark `update_readme_table` as `true` in your GitHub Action config and we'll do the work of building a custom table for you.
           # Default is `false` - boolean.
-          #update_readme_table: true
+          update_readme_table: true
 
           # Skips committing the generated formula to a homebrew tap (useful for local testing).
           # Default is shown - boolean.
@@ -80,4 +79,4 @@ jobs:
 
           # Logs debugging info to console.
           # Default is shown - boolean.
-          debug: false
+          debug: true
