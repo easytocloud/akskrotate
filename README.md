@@ -30,7 +30,7 @@ The process is straigtforward and best explained by its output:
 $ akskrotate 
 akskrotate creates a new AK/SK key and deactivates the current AK/SK
 
-akskrotate assumes your profiles are stored in ~/.aws/credentials
+akskrotate expects your profiles are stored in ~/.aws/credentials
 
 akskrotate rotates the AWS IAM AK/SK for the user identified by erik@easytocloud
 
@@ -47,7 +47,7 @@ as at no time you can have more than 2 keys
 
 Do you want to continue: [YN] Y
 Here we go ..
-Retriving keys for erik@easytocloud ..
+Retrieving keys for erik@easytocloud ..
 Making sure there is a free slot for a temporary second active key ..
 Removing inactive key ..
 Looking for other profiles with same access_key ..
