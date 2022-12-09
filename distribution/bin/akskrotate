@@ -14,11 +14,11 @@ fi
 cat <<EOF
 akskrotate creates a new AK/SK key and deactivates the current AK/SK (rotate)
 
-akskrotate expects your profiles are stored in ~/.aws/credentials
+akskrotate expects your profiles are stored in ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}
 
 akskrotate rotates the AWS IAM AK/SK for the user identified by ${AWS_PROFILE}
 
-akskrotate updates ~/.aws/credentials automatically for
+akskrotate updates credentials automatically for
   - ${AWS_PROFILE} 
   - other profiles that reference the same access key
 
@@ -47,7 +47,7 @@ esac
 echo "Retrieving keys for ${AWS_PROFILE} .."
 if ! ORG_Keys=$(aws iam list-access-keys)
 then
-	echo "Could not list access keys"
+	echo "Could not list access keys for ${AWS_PROFILE}" >&2
 	exit 1
 fi
 
@@ -110,20 +110,20 @@ echo "Creating new AK/SK .."
 
 if ! NewKey=$(aws iam create-access-key)
 then
-	echo "Could not create new key"
+	echo "Could not create new key" >&2
 	exit 1
 fi
 
 # backup credentials file just in case
 
-echo "Backing up your credentials file into ~/.aws/credentials.akskrotate .."
-cp ~/.aws/credentials ~/.aws/credentials.akskrotate
+echo "Backing up your credentials file into ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate .."
+cp ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials} ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate
 
 # store credentials in ~/.aws/credentials
 
 for pr in $(echo ${ProfilesToUpdate} | tr ';' ' ')
 do
-	echo "Updating AK/SK for profile ${pr} in ~/.aws/credentials .."
+	echo "Updating AK/SK for profile ${pr} in ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials} .."
 
 	aws configure set aws_access_key_id $(echo $NewKey| jq  .AccessKey.AccessKeyId | tr -d '"') --profile ${pr}
 	aws configure set aws_secret_access_key $( echo $NewKey| jq  .AccessKey.SecretAccessKey | tr -d '"' ) --profile ${pr}
@@ -141,9 +141,9 @@ echo -n "Testing new key .. "
 
 if ! IAM=$(aws sts get-caller-identity > /dev/null)
 then
-	echo "FAILED!"
-	echo "There is an issue using the new configuration - both keys are active now!!"
-	echo "Your might want to restore ~/.aws/credentials.akskrotate .."
+	echo "FAILED!" >&2
+	echo "There is an issue using the new configuration - both keys are active now!!" >&2
+	echo "Your might want to restore ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate .." >&2
 	exit 4
 else
 	echo "SUCCESS"
@@ -155,5 +155,5 @@ echo "Deactivating previous key .."
 aws iam update-access-key --status Inactive --access-key-id ${ToRetire} 
 
 echo "Cleaning up backup .."
-rm -f ~/.aws/credentials.akskrotate
+rm -f ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate
 echo "Done."
