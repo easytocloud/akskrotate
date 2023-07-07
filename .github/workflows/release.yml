@@ -42,7 +42,7 @@ jobs:
 
           # Custom test command for your formula so you can run `brew test`.
           # Optional - string.
-          test: 'assert_match("Please set AWS_PROFILE before calling akskrotate", shell_output("akskrotate 2>&1", 1))'
+          test: 'assert_match("Please set AWS_PROFILE before calling akskrotate", shell_output("unset AWS_PROFILE ; akskrotate 2>&1", 1))'
 
           # Adds URL and checksum targets for different OS and architecture pairs. Using this option assumes 
           # a tar archive exists on your GitHub repo with the following URL pattern (this cannot be customized):
