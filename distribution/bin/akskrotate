@@ -5,24 +5,35 @@
 # (C) easytocloud 2021
 #
 
+# test prerequisites
+
 if test -z "${AWS_PROFILE}"
 then
 	echo "Please set AWS_PROFILE before calling akskrotate"
 	exit 1
 fi
 
+# test if jq is installed
+
+if ! command -v jq > /dev/null
+then
+	echo "Please install jq before calling akskrotate"
+	exit 1
+fi
+
+# introduce akskrotate
 cat <<EOF
 akskrotate creates a new AK/SK key and deactivates the current AK/SK (rotate)
 
 akskrotate expects your profiles are stored in ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}
 
-akskrotate rotates the AWS IAM AK/SK for the user identified by ${AWS_PROFILE}
+akskrotate rotates the AWS IAM AK/SK for the user identified by "${AWS_PROFILE}"
 
 akskrotate updates credentials automatically for
-  - ${AWS_PROFILE} 
+  - "${AWS_PROFILE}" 
   - other profiles that reference the same access key
 
-you are responsible for updating the keys should they be used anywhere else
+YOU are responsible for updating the keys should they be used anywhere else
 
 akskrotate does not deactivate your current key until the new key is tested and functional
 
@@ -31,10 +42,10 @@ as at no time you can have more than 2 keys
 
 EOF
 
-echo -n "Do you want to continue: [YN] "
+echo -n "Do you want to continue: [yN] "
 read Confirmation
 case ${Confirmation} in
-Y)
+y|Y)
 	echo "Here we go .."
 	;;
 *)
