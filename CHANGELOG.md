@@ -1,3 +1,10 @@
+## [0.2.5](https://github.com/easytocloud/akskrotate/compare/v0.2.4...v0.2.5) (2024-07-31)
+
+
+### Bug Fixes
+
+* removed aws cli dependency as brew is not a supported way to install aws cli ([6677c52](https://github.com/easytocloud/akskrotate/commit/6677c52cd8e7efad21e1b4ab8a8bb3844d7613d0))
+
 ## [0.2.4](https://github.com/easytocloud/akskrotate/compare/v0.2.3...v0.2.4) (2024-07-31)
 
 
