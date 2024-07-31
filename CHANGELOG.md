@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/easytocloud/akskrotate/compare/v0.2.2...v0.2.3) (2024-07-31)
+
+
+### Bug Fixes
+
+* added .releaserc to repo ([33f24ab](https://github.com/easytocloud/akskrotate/commit/33f24ab6e9b3f2ae2500a535c6d535806998abfd))
+
 ## [0.2.2](https://github.com/easytocloud/akskrotate/compare/v0.2.1...v0.2.2) (2024-07-31)
 
 
