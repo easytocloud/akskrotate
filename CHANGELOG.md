@@ -1,3 +1,10 @@
+## [0.2.4](https://github.com/easytocloud/akskrotate/compare/v0.2.3...v0.2.4) (2024-07-31)
+
+
+### Bug Fixes
+
+* changed aws cli dependency ([1c95bf4](https://github.com/easytocloud/akskrotate/commit/1c95bf4cdaaf442eb4385887d2a32c05281f00ff))
+
 ## [0.2.3](https://github.com/easytocloud/akskrotate/compare/v0.2.2...v0.2.3) (2024-07-31)
 
 
