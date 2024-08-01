@@ -1,3 +1,5 @@
+![release workflow](https://github.com/easytocloud/akskrotate/actions/workflows/release.yml/badge.svg)
+
 # akskrotate
 rotate your AWS access key / secret key with confidence
 
