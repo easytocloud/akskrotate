@@ -17,8 +17,16 @@ fi
 
 if ! command -v jq > /dev/null
 then
-	echo "Please install jq before calling akskrotate"
-	exit 1
+        echo "Please install jq before calling akskrotate"
+        exit 1
+fi
+
+# test if aws cli is installed
+
+if ! command -v aws > /dev/null
+then
+        echo "Please install the AWS CLI before calling akskrotate"
+        exit 1
 fi
 
 # introduce akskrotate
