@@ -19,7 +19,7 @@ cp distribution/bin/akskrotate /usr/local/bin
 ```
 
 ## Usage
-asskrotate solves a challenge that many AWS cli users have.
+akskrotate solves a challenge that many AWS cli users have.
 
 > It is best practice to regularly change your passwords and rotate your AWS IAM Ak/Sk.
 
