@@ -1,3 +1,10 @@
+## [0.2.6](https://github.com/easytocloud/akskrotate/compare/v0.2.5...v0.2.6) (2025-05-19)
+
+
+### Bug Fixes
+
+* add aws cli check and minor fixes ([12ba099](https://github.com/easytocloud/akskrotate/commit/12ba09988568bbd914d842a1cd7b4ff2b45c2653))
+
 ## [0.2.5](https://github.com/easytocloud/akskrotate/compare/v0.2.4...v0.2.5) (2024-07-31)
 
 
