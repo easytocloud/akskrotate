@@ -136,7 +136,7 @@ fi
 # backup credentials file just in case
 
 echo "Backing up your credentials file into ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate .."
-cp ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials} ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate
+cp "${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}" "${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate"
 
 # store credentials in ~/.aws/credentials
 
