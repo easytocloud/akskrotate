@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/easytocloud/akskrotate/compare/v0.3.0...v0.3.1) (2025-07-21)
+
+
+### Bug Fixes
+
+* update test to handle shell nounset option ([dc56c86](https://github.com/easytocloud/akskrotate/commit/dc56c86ce7114fab1c0affcd894484857d45449c))
+
 # [0.3.0](https://github.com/easytocloud/akskrotate/compare/v0.2.6...v0.3.0) (2025-07-21)
 
 
