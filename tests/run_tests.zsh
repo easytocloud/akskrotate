@@ -1,8 +1,8 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 set -e
 for t in $(dirname $0)/test_*.zsh; do
   echo "Running ${t}..."
-  if /usr/bin/zsh "$t"; then
+  if zsh "$t"; then
     echo "OK: ${t}"
   else
     echo "FAILED: ${t}"

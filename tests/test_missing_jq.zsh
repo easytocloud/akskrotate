@@ -1,10 +1,10 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 SCRIPT_DIR=$(cd $(dirname $0)/.. && pwd)
 AKSKROTATE="$SCRIPT_DIR/distribution/bin/akskrotate"
 set +e
 export AWS_PROFILE=dummy
 PATH=/nonexistent
-output=$(/usr/bin/zsh "$AKSKROTATE" 2>&1)
+output=$("$AKSKROTATE" 2>&1)
 rc=$?
 set -e
 if [[ $rc -eq 1 && "$output" == "Please install jq before calling akskrotate" ]]; then

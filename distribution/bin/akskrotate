@@ -1,4 +1,4 @@
-#! /usr/bin/env zsh
+#!/bin/zsh
 set -o errexit -o nounset -o pipefail
 #
 # akskrotate - rotate your AWS IAM access key / secret key with confidence
@@ -6,11 +6,18 @@ set -o errexit -o nounset -o pipefail
 # (C) easytocloud 2021
 #
 
-# test prerequisites
+# test prerequisites and validate inputs
 
 if test -z "${AWS_PROFILE}"
 then
 	echo "Please set AWS_PROFILE before calling akskrotate"
+	exit 1
+fi
+
+# Validate AWS_PROFILE format (basic validation)
+if [[ ! "${AWS_PROFILE}" =~ ^[a-zA-Z0-9._@-]+$ ]]
+then
+	echo "Invalid AWS_PROFILE format. Profile names should contain only alphanumeric characters, dots, underscores, @ symbols, and hyphens."
 	exit 1
 fi
 
@@ -62,7 +69,7 @@ y|Y)
 	exit 0
 esac
 
-# get currrent aksks from AWS
+# Get current access keys from AWS
 
 echo "Retrieving keys for ${AWS_PROFILE} .."
 if ! ORG_Keys=$(aws iam list-access-keys)
@@ -71,16 +78,16 @@ then
 	exit 1
 fi
 
-# if multiple keys exist...
+# If multiple keys exist, ensure we have space for a new temporary key
 
 echo "Making sure there is a free slot for a temporary second active key .."
 
-if (( $( echo ${ORG_Keys} | jq  ' .AccessKeyMetadata | length ') > 1 ))
+if (( $( echo "${ORG_Keys}" | jq  ' .AccessKeyMetadata | length ') > 1 ))
 then
 	#
 	# count active
 
-	ActiveCnt=$( echo ${ORG_Keys}| jq -r '.AccessKeyMetadata[].Status' | grep -w Active | wc -l)
+	ActiveCnt=$( echo "${ORG_Keys}" | jq -r '.AccessKeyMetadata[].Status' | grep -w Active | wc -l)
 
 	if (( ActiveCnt > 1 ))
 	then
@@ -95,26 +102,26 @@ then
 	# remove inactive key
 
 	echo "Removing inactive key .."
-	if ! aws iam delete-access-key --access-key-id $(echo $ORG_Keys| jq -c '.AccessKeyMetadata[] | select( .Status == "Inactive") | .AccessKeyId' | tr -d '"')
+	if ! aws iam delete-access-key --access-key-id "$(echo "$ORG_Keys" | jq -c '.AccessKeyMetadata[] | select( .Status == "Inactive") | .AccessKeyId' | tr -d '"')"
 	then
 		echo "Could not remove inactive key" >&2
 		exit 2
 	fi
 fi
 
-# Now only one key should be active, thats the one to replace
+# Now only one key should be active, that's the one to replace
 
-ToRetire=$(echo ${ORG_Keys} | jq -c '.AccessKeyMetadata[] | select( .Status == "Active") | .AccessKeyId' | tr -d '"' )
+ToRetire=$(echo "${ORG_Keys}" | jq -c '.AccessKeyMetadata[] | select( .Status == "Active") | .AccessKeyId' | tr -d '"' )
 
 echo "Looking for other profiles with same access_key .."
 
 ProfilesToUpdate=${AWS_PROFILE}
 
-for pr in $(aws configure list-profiles)
+for pr in $(aws configure list-profiles 2>/dev/null || echo "")
 do
     if [[ ${pr} != ${AWS_PROFILE} ]]
     then
-		ak=$( aws configure get aws_access_key_id --profile ${pr})
+		ak=$( aws configure get aws_access_key_id --profile "${pr}" 2>/dev/null || echo "")
 		if [[ ${ak} == ${ToRetire} ]]
 		then 
 			echo "Adding ${pr} to list of profiles to update .."
@@ -123,8 +130,7 @@ do
     fi
 done
 
-#
-# create new pair
+# Create new access key pair
 
 echo "Creating new AK/SK .."
 
@@ -136,21 +142,24 @@ fi
 
 # backup credentials file just in case
 
-echo "Backing up your credentials file into ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate .."
-cp "${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}" "${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate"
+CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}"
+echo "Backing up your credentials file into ${CREDENTIALS_FILE}.akskrotate .."
+cp "${CREDENTIALS_FILE}" "${CREDENTIALS_FILE}.akskrotate"
 
 # store credentials in ~/.aws/credentials
 
-for pr in $(echo ${ProfilesToUpdate} | tr ';' ' ')
+for pr in $(echo "${ProfilesToUpdate}" | tr ';' ' ')
 do
-	echo "Updating AK/SK for profile ${pr} in ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials} .."
+	echo "Updating AK/SK for profile ${pr} in ${CREDENTIALS_FILE} .."
 
-	aws configure set aws_access_key_id $(echo $NewKey| jq  .AccessKey.AccessKeyId | tr -d '"') --profile ${pr}
-	aws configure set aws_secret_access_key $( echo $NewKey| jq  .AccessKey.SecretAccessKey | tr -d '"' ) --profile ${pr}
+	aws configure set aws_access_key_id "$(echo "$NewKey" | jq  .AccessKey.AccessKeyId | tr -d '"')" --profile "${pr}"
+	aws configure set aws_secret_access_key "$( echo "$NewKey" | jq  .AccessKey.SecretAccessKey | tr -d '"' )" --profile "${pr}"
 done
 
-echo "Waiting 15 seconds for IAM changes to globally propagate .."
-sleep 15
+# Configurable IAM propagation delay (default 15 seconds)
+IAM_PROPAGATION_DELAY="${AKSKROTATE_IAM_DELAY:-15}"
+echo "Waiting ${IAM_PROPAGATION_DELAY} seconds for IAM changes to globally propagate .."
+sleep "${IAM_PROPAGATION_DELAY}"
 
 # test new configuration
 
@@ -159,21 +168,23 @@ sleep 15
 
 echo -n "Testing new key .. "
 
-if ! IAM=$(aws sts get-caller-identity > /dev/null)
+if ! IAM=$(aws sts get-caller-identity 2>/dev/null)
 then
 	echo "FAILED!" >&2
 	echo "There is an issue using the new configuration - both keys are active now!!" >&2
-	echo "Your might want to restore ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate .." >&2
+	echo "To restore your previous configuration:" >&2
+	echo "  cp \"${CREDENTIALS_FILE}.akskrotate\" \"${CREDENTIALS_FILE}\"" >&2
+	echo "Consider checking AWS IAM propagation delays or network connectivity." >&2
 	exit 4
 else
 	echo "SUCCESS"
 fi
 
-# deativate old aksk
+# Deactivate old access key
 echo "Deactivating previous key .."
 
-aws iam update-access-key --status Inactive --access-key-id ${ToRetire} 
+aws iam update-access-key --status Inactive --access-key-id "${ToRetire}" 
 
 echo "Cleaning up backup .."
-rm -f ${AWS_SHARED_CREDENTIALS_FILE:-~/.aws/credentials}.akskrotate
+rm -f "${CREDENTIALS_FILE}.akskrotate"
 echo "Done."

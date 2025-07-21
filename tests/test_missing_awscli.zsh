@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 SCRIPT_DIR=$(cd $(dirname $0)/.. && pwd)
 AKSKROTATE="$SCRIPT_DIR/distribution/bin/akskrotate"
 set +e
@@ -6,7 +6,7 @@ export AWS_PROFILE=dummy
 tmp=$(mktemp -d)
 ln -s $(which jq) $tmp/jq
 PATH=$tmp
-output=$(/usr/bin/zsh "$AKSKROTATE" 2>&1)
+output=$("$AKSKROTATE" 2>&1)
 rc=$?
 /bin/rm -rf $tmp
 set -e
