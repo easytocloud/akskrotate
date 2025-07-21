@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/easytocloud/akskrotate/compare/v0.2.6...v0.3.0) (2025-07-21)
+
+
+### Features
+
+* enhance security and add comprehensive improvements ([ff40756](https://github.com/easytocloud/akskrotate/commit/ff40756df8f2b5a205bf3896b2ebf15ae468af0f))
+
 ## [0.2.6](https://github.com/easytocloud/akskrotate/compare/v0.2.5...v0.2.6) (2025-05-19)
 
 
